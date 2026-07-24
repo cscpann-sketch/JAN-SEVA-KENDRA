@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<style>
+  :root{
+    --primary:#4f46e5;
+    --primary-dark:#4338ca;
+    --primary-light:#eef2ff;
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --danger:#dc2626;
+    --success:#16a34a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding-top:56px;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+
+  /* ===== Separate Index Panel link ===== */
+  .nav-link-bar{
+    position:fixed;
+    top:14px;
+    right:16px;
+    z-index:50;
+  }
+  .nav-link-bar a{
+    background:#fff;
+    color:var(--primary-dark);
+    text-decoration:none;
+    padding:9px 16px;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:600;
+    display:flex;align-items:center;gap:6px;
+    box-shadow:0 2px 10px rgba(15,23,42,0.12);
+    border:1px solid var(--border);
+    transition:background .15s;
+  }
+  .nav-link-bar a:hover{background:var(--primary-light);}
+
+  /* ===== Layout ===== */
+  .container{
+    max-width:960px;
+    margin:28px auto;
+    padding:0 20px 60px;
+  }
+  .page-title{
+    font-size:15px;
+    color:var(--muted);
+    margin:0 2px 18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(15,23,42,0.04);
+    padding:22px 24px;
+    margin-bottom:20px;
+  }
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+  }
+  .card-head .ic{
+    width:34px;height:34px;border-radius:9px;
+    background:var(--primary-light);
+    color:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;flex-shrink:0;
+  }
+  .card-head h2{margin:0;font-size:16px;color:var(--text);font-weight:700;}
+  .card-head p{margin:2px 0 0;font-size:12.5px;color:var(--muted);}
+
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:6px;
+    margin-top:14px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type="text"], input[type="url"], textarea, select{
+    width:100%;
+    padding:11px 13px;
+    border:1.5px solid var(--border);
+    border-radius:9px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fbfcfe;
+    transition:border-color .15s, background .15s;
+  }
+  input[type="text"]:focus, input[type="url"]:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--primary);
+    background:#fff;
+  }
+  textarea{resize:vertical;}
+  input[type="color"]{
+    width:100%;
+    height:44px;
+    padding:4px;
+    border:1.5px solid var(--border);
+    border-radius:9px;
+    cursor:pointer;
+    background:#fbfcfe;
+  }
+  .row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .row > div{flex:1;min-width:180px;}
+
+  .btn{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:11px 20px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    margin-top:18px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:background .15s, transform .1s;
+  }
+  .btn:hover{background:var(--primary-dark);}
+  .btn:active{transform:scale(0.98);}
+  .btn.danger{background:#fef2f2;color:var(--danger);}
+  .btn.danger:hover{background:var(--danger);color:#fff;}
+  .btn.small{padding:7px 13px;font-size:12.5px;margin-top:0;}
+  .btn.ghost{background:var(--primary-light);color:var(--primary-dark);}
+  .btn.ghost:hover{background:#e0e4fd;}
+
+  .msg{
+    font-size:13px;
+    color:var(--success);
+    margin-top:10px;
+    min-height:16px;
+    font-weight:600;
+  }
+
+  /* ===== Link cards list ===== */
+  .links-list{margin-top:20px;display:flex;flex-direction:column;gap:12px;}
+  .links-empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:13.5px;
+    padding:28px 10px;
+    border:1.5px dashed var(--border);
+    border-radius:10px;
+  }
+  .link-row{
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+    background:#fbfcfe;
+  }
+  .link-row .swatch{
+    width:46px;height:46px;border-radius:10px;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#fff;font-size:16px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+  }
+  .link-row .info{flex:1;min-width:180px;}
+  .link-row .info .name-edit{
+    font-weight:700;
+    font-size:14px;
+    padding:8px 10px;
+    margin-bottom:6px;
+  }
+  .link-row .info .url-edit{
+    font-size:12px;
+    color:var(--muted);
+    padding:7px 10px;
+    margin-bottom:6px;
+  }
+  .link-row .desc-edit{
+    width:100%;
+    margin-top:0;
+    font-size:12.5px;
+    padding:8px 10px;
+    border-radius:7px;
+  }
+  .link-row .colors{display:flex;gap:6px;align-items:center;}
+  .link-row .colors input[type="color"]{
+    width:32px;height:32px;padding:2px;border-radius:7px;
+  }
+  .link-row .actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .move-btns{display:flex;gap:4px;}
+  .move-btns .btn{padding:6px 10px;font-size:13px;}
+  .move-btns .btn:disabled{opacity:.35;cursor:not-allowed;}
+  .sync-status{
+    font-size:12px;
+    color:var(--muted);
+    margin:-6px 2px 16px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .sync-status .dot{
+    width:8px;height:8px;border-radius:50%;background:#94a3b8;
+  }
+  .sync-status.ok .dot{background:var(--success);}
+  .sync-status.err .dot{background:var(--danger);}
+</style>
+</head>
+<body>
+
+<div class="nav-link-bar">
+  <a href="index-panel.html">🌐 Index Panel</a>
+</div>
+
+<div class="container">
+
+  <p class="page-title">📋 Yahan se apni website ke naam, button style aur links manage karein</p>
+  <div class="sync-status" id="syncStatus"><span class="dot"></span><span id="syncStatusText">Firebase se connect ho raha hai...</span></div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ic">🏷️</div>
+      <div>
+        <h2>Website Naam / Title</h2>
+        <p>Yeh Index Panel par bade heading ke roop me dikhega</p>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Website Title (Bada heading)</label>
+        <input type="text" id="siteTitleInput" placeholder="Jaise: Mera School Portal">
+      </div>
+      <div>
+        <label>Subtitle / Tagline (optional)</label>
+        <input type="text" id="siteSubtitleInput" placeholder="Jaise: Aapka swagat hai">
+      </div>
+    </div>
+    <button class="btn" onclick="saveSiteInfo()">💾 Title Save Karein</button>
+    <div class="msg" id="titleMsg"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ic">🎨</div>
+      <div>
+        <h2>Default Button Style</h2>
+        <p>Naye button banate waqt yeh rang/font default set hoga</p>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Button Background Color</label>
+        <input type="color" id="btnBgColor">
+      </div>
+      <div>
+        <label>Button Text Color</label>
+        <input type="color" id="btnTextColor">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Font Family</label>
+        <select id="btnFontFamily">
+          <option value="'Segoe UI', Arial, sans-serif">Segoe UI (Default)</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+          <option value="Tahoma, sans-serif">Tahoma</option>
+          <option value="cursive">Cursive</option>
+        </select>
+      </div>
+      <div>
+        <label>Font Size (px)</label>
+        <input type="text" id="btnFontSize" placeholder="Jaise: 15">
+      </div>
+    </div>
+    <button class="btn" onclick="saveButtonStyle()">💾 Style Save Karein</button>
+    <div class="msg" id="styleMsg"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ic">📢</div>
+      <div>
+        <h2>Advertisement (Title ke Left / Right)</h2>
+        <p>Index Panel par title ke left aur right side alag-alag ad dikhayein</p>
+      </div>
+    </div>
+
+    <label style="margin-top:0;">⬅️ Left Side Ad</label>
+    <div class="row">
+      <div>
+        <label>Ad Text (khud likhein)</label>
+        <input type="text" id="leftAdText" placeholder="Jaise: 🎉 Naya Admission Chalu Hai!" maxlength="60">
+      </div>
+      <div>
+        <label>Ad Color</label>
+        <input type="color" id="leftAdColor" value="#dc2626">
+      </div>
+    </div>
+
+    <label>➡️ Right Side Ad</label>
+    <div class="row">
+      <div>
+        <label>Ad Text (khud likhein)</label>
+        <input type="text" id="rightAdText" placeholder="Jaise: 📞 Contact: 98765-43210" maxlength="60">
+      </div>
+      <div>
+        <label>Ad Color</label>
+        <input type="color" id="rightAdColor" value="#dc2626">
+      </div>
+    </div>
+
+    <button class="btn" onclick="saveAds()">💾 Ad Save Karein</button>
+    <button class="btn danger" onclick="clearAds()">🗑 Dono Ad Hatayein</button>
+    <div class="msg" id="adMsg"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ic">🔗</div>
+      <div>
+        <h2>Link Buttons</h2>
+        <p>Naya link button add karein ya neeche list se manage karein</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Button Ka Naam</label>
+        <input type="text" id="linkNameInput" placeholder="Jaise: Admit Card">
+      </div>
+      <div>
+        <label>Link (URL)</label>
+        <input type="url" id="linkUrlInput" placeholder="https://example.com">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Is Button Ka Background Color</label>
+        <input type="color" id="linkBgInput" value="#2563eb">
+      </div>
+      <div>
+        <label>Is Button Ka Text Color</label>
+        <input type="color" id="linkTextInput" value="#ffffff">
+      </div>
+    </div>
+    <label>Yaha Se Kya Kya Kaam Ho Sakta Hai / Kaunse Dastavej Chahiye (Description)</label>
+    <textarea id="linkDescInput" placeholder="Jaise: Yaha se admit card download kar sakte hain.&#10;Zaroori dastavej: Registration number, Janm tithi" rows="3"></textarea>
+    <button class="btn" onclick="addLink()">➕ Link Add Karein</button>
+    <div class="msg" id="linkMsg"></div>
+
+    <div class="links-list" id="linksList"></div>
+  </div>
+
+</div>
+
+<script type="module">
+// ---------- Firebase setup ----------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBSNf2tBRYLxLVH1Xj1oUef-aR4jd6uKBs",
+  authDomain: "web-site-jan-seva-kendra.firebaseapp.com",
+  projectId: "web-site-jan-seva-kendra",
+  storageBucket: "web-site-jan-seva-kendra.firebasestorage.app",
+  messagingSenderId: "750982902874",
+  appId: "1:750982902874:web:f873c48856021ff3801463",
+  measurementId: "G-4BLJ4DK435"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const dataDocRef = doc(db, "sitePanel", "main");
+
+function defaultData(){
+  return {
+    title: "Mera Website",
+    subtitle: "Yahan se apne links access karein",
+    links: [],
+    buttonStyle: {
+      bgColor: "#2563eb",
+      textColor: "#ffffff",
+      fontFamily: "'Segoe UI', Arial, sans-serif",
+      fontSize: "15"
+    },
+    ads: {
+      left: { text: "", color: "#dc2626" },
+      right: { text: "", color: "#dc2626" }
+    }
+  };
+}
+
+let data = defaultData();
+
+function setSyncStatus(state, text){
+  const el = document.getElementById('syncStatus');
+  el.className = 'sync-status ' + state;
+  document.getElementById('syncStatusText').textContent = text;
+}
+
+async function loadData(){
+  try{
+    const snap = await getDoc(dataDocRef);
+    if(snap.exists()){
+      data = snap.data();
+    } else {
+      data = defaultData();
+      await setDoc(dataDocRef, data);
+    }
+    setSyncStatus('ok', 'Firebase se connected — data live sync ho raha hai ✔');
+  }catch(e){
+    console.error("Firebase load error:", e);
+    data = defaultData();
+    setSyncStatus('err', 'Firebase se connect nahi ho paya — check Firestore rules/network');
+  }
+}
+
+async function saveData(newData){
+  data = newData;
+  try{
+    await setDoc(dataDocRef, data);
+    setSyncStatus('ok', 'Firebase se connected — data live sync ho raha hai ✔');
+  }catch(e){
+    console.error("Firebase save error:", e);
+    setSyncStatus('err', 'Save fail ho gaya — Firebase se connect nahi ho paya');
+  }
+}
+
+// ---------- Title / Subtitle ----------
+window.saveSiteInfo = async function saveSiteInfo(){
+  const t = document.getElementById('siteTitleInput').value.trim();
+  const s = document.getElementById('siteSubtitleInput').value.trim();
+  if(t) data.title = t;
+  if(s !== "") data.subtitle = s;
+  await saveData(data);
+  const msg = document.getElementById('titleMsg');
+  msg.textContent = "Title save ho gaya ✔";
+  setTimeout(()=> msg.textContent = "", 2000);
+}
+
+// ---------- Button Style ----------
+function ensureButtonStyle(){
+  if(!data.buttonStyle){
+    data.buttonStyle = {
+      bgColor: "#2563eb",
+      textColor: "#ffffff",
+      fontFamily: "'Segoe UI', Arial, sans-serif",
+      fontSize: "15"
+    };
+  }
+}
+
+window.saveButtonStyle = async function saveButtonStyle(){
+  ensureButtonStyle();
+  data.buttonStyle.bgColor = document.getElementById('btnBgColor').value;
+  data.buttonStyle.textColor = document.getElementById('btnTextColor').value;
+  data.buttonStyle.fontFamily = document.getElementById('btnFontFamily').value;
+  const size = document.getElementById('btnFontSize').value.trim();
+  data.buttonStyle.fontSize = size ? size : "15";
+  await saveData(data);
+  const msg = document.getElementById('styleMsg');
+  msg.textContent = "Style save ho gaya ✔";
+  setTimeout(()=> msg.textContent = "", 2000);
+}
+
+// ---------- Ads (Left / Right of title) ----------
+function ensureAds(){
+  if(!data.ads){
+    data.ads = {
+      left: { text: "", color: "#dc2626" },
+      right: { text: "", color: "#dc2626" }
+    };
+  }
+}
+
+window.saveAds = async function saveAds(){
+  ensureAds();
+  data.ads.left.text = document.getElementById('leftAdText').value.trim();
+  data.ads.left.color = document.getElementById('leftAdColor').value;
+  data.ads.right.text = document.getElementById('rightAdText').value.trim();
+  data.ads.right.color = document.getElementById('rightAdColor').value;
+  await saveData(data);
+  const msg = document.getElementById('adMsg');
+  msg.style.color = "#16a34a";
+  msg.textContent = "Ad save ho gaya ✔";
+  setTimeout(()=> msg.textContent = "", 2000);
+}
+
+window.clearAds = async function clearAds(){
+  if(!confirm("Kya aap dono ad hatana chahte hain?")) return;
+  data.ads = { left:{text:"",color:"#dc2626"}, right:{text:"",color:"#dc2626"} };
+  await saveData(data);
+  document.getElementById('leftAdText').value = "";
+  document.getElementById('leftAdColor').value = "#dc2626";
+  document.getElementById('rightAdText').value = "";
+  document.getElementById('rightAdColor').value = "#dc2626";
+  const msg = document.getElementById('adMsg');
+  msg.style.color = "#16a34a";
+  msg.textContent = "Ad hata diya gaya ✔";
+  setTimeout(()=> msg.textContent = "", 2000);
+}
+
+// ---------- Links ----------
+window.addLink = async function addLink(){
+  const name = document.getElementById('linkNameInput').value.trim();
+  const url = document.getElementById('linkUrlInput').value.trim();
+  const bg = document.getElementById('linkBgInput').value;
+  const text = document.getElementById('linkTextInput').value;
+  const desc = document.getElementById('linkDescInput').value.trim();
+  const msg = document.getElementById('linkMsg');
+  if(!name || !url){
+    msg.style.color = "#dc2626";
+    msg.textContent = "⚠ Kripya naam aur URL dono bharein.";
+    return;
+  }
+  data.links.push({id: Date.now(), name, url, bgColor: bg, textColor: text, description: desc});
+  await saveData(data);
+  document.getElementById('linkNameInput').value = "";
+  document.getElementById('linkUrlInput').value = "";
+  document.getElementById('linkDescInput').value = "";
+  msg.style.color = "#16a34a";
+  msg.textContent = "Link add ho gaya ✔";
+  setTimeout(()=> msg.textContent = "", 2000);
+  renderAdminLinks();
+}
+
+window.updateLinkField = async function updateLinkField(id, field, value){
+  const link = data.links.find(l => l.id === id);
+  if(!link) return;
+  value = value.trim();
+  if(field === 'name' && !value) return;
+  if(field === 'url' && !value) return;
+  link[field] = value;
+  await saveData(data);
+  renderAdminLinks();
+}
+
+window.moveLink = async function moveLink(id, direction){
+  const idx = data.links.findIndex(l => l.id === id);
+  const newIdx = idx + direction;
+  if(idx === -1 || newIdx < 0 || newIdx >= data.links.length) return;
+  const temp = data.links[idx];
+  data.links[idx] = data.links[newIdx];
+  data.links[newIdx] = temp;
+  await saveData(data);
+  renderAdminLinks();
+}
+
+window.updateLinkDesc = async function updateLinkDesc(id, value){
+  const link = data.links.find(l => l.id === id);
+  if(link){
+    link.description = value;
+    await saveData(data);
+  }
+}
+
+window.updateLinkColor = async function updateLinkColor(id, field, value){
+  const link = data.links.find(l => l.id === id);
+  if(link){
+    link[field] = value;
+    await saveData(data);
+    renderAdminLinks();
+  }
+}
+
+window.deleteLink = async function deleteLink(id){
+  if(!confirm("Kya aap sach me is link ko delete karna chahte hain?")) return;
+  data.links = data.links.filter(l => l.id !== id);
+  await saveData(data);
+  renderAdminLinks();
+}
+
+function renderAdminLinks(){
+  const list = document.getElementById('linksList');
+  list.innerHTML = "";
+  if(data.links.length === 0){
+    list.innerHTML = '<div class="links-empty">Abhi koi link add nahi hua hai. Upar form se naya link add karein.</div>';
+    return;
+  }
+  data.links.forEach((link, idx) => {
+    const row = document.createElement('div');
+    row.className = 'link-row';
+    const bg = link.bgColor || '#2563eb';
+    const initial = (link.name || '?').trim().charAt(0).toUpperCase();
+    row.innerHTML = `
+      <div class="swatch" style="background:${bg};">${initial}</div>
+      <div class="info">
+        <input type="text" class="name-edit" value="${escapeHtml(link.name)}" placeholder="Button ka naam"
+          onchange="updateLinkField(${link.id}, 'name', this.value)">
+        <input type="text" class="url-edit" value="${escapeHtml(link.url)}" placeholder="Link (URL)"
+          onchange="updateLinkField(${link.id}, 'url', this.value)">
+        <textarea class="desc-edit" rows="2" placeholder="Description / dastavej likhein..."
+          onchange="updateLinkDesc(${link.id}, this.value)">${escapeHtml(link.description || "")}</textarea>
+      </div>
+      <div class="colors">
+        <input type="color" value="${link.bgColor || '#2563eb'}" title="Background Color"
+          onchange="updateLinkColor(${link.id}, 'bgColor', this.value)">
+        <input type="color" value="${link.textColor || '#ffffff'}" title="Text Color"
+          onchange="updateLinkColor(${link.id}, 'textColor', this.value)">
+      </div>
+      <div class="actions">
+        <div class="move-btns">
+          <button class="btn ghost small" onclick="moveLink(${link.id}, -1)" ${idx===0 ? 'disabled' : ''} title="Upar le jaayein">⬆</button>
+          <button class="btn ghost small" onclick="moveLink(${link.id}, 1)" ${idx===data.links.length-1 ? 'disabled' : ''} title="Neeche le jaayein">⬇</button>
+        </div>
+        <button class="btn danger small" onclick="deleteLink(${link.id})">🗑 Delete</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ---------- Init ----------
+async function init(){
+  setSyncStatus('', 'Firebase se connect ho raha hai...');
+  await loadData();
+  document.getElementById('siteTitleInput').value = data.title;
+  document.getElementById('siteSubtitleInput').value = data.subtitle;
+  ensureButtonStyle();
+  document.getElementById('btnBgColor').value = data.buttonStyle.bgColor;
+  document.getElementById('btnTextColor').value = data.buttonStyle.textColor;
+  document.getElementById('btnFontFamily').value = data.buttonStyle.fontFamily;
+  document.getElementById('btnFontSize').value = data.buttonStyle.fontSize;
+  ensureAds();
+  document.getElementById('leftAdText').value = data.ads.left.text || "";
+  document.getElementById('leftAdColor').value = data.ads.left.color || "#dc2626";
+  document.getElementById('rightAdText').value = data.ads.right.text || "";
+  document.getElementById('rightAdColor').value = data.ads.right.color || "#dc2626";
+  renderAdminLinks();
+}
+init();
+</script>
+
+</body>
+</html>
