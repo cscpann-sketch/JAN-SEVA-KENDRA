@@ -1,0 +1,10 @@
+{
+  "name": "Website",
+  "short_name": "Website",
+  "start_url": "./index-panel.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": []
+}
